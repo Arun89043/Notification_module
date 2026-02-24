@@ -1,0 +1,249 @@
+Notifications Module
+📌 Overview
+
+The Notifications Module is a secure, scalable component of the Enterprise Logistics Platform designed to generate and manage user notifications across multiple business events.
+
+This module supports:
+
+Shipment assignment alerts
+
+Delivery status updates
+
+Payment confirmations
+
+Payout processing notifications
+
+Email notifications
+
+SMS notifications (mock implementation)
+
+JWT-based authentication
+
+Secure, user-scoped access control
+
+🏗 Architecture Design
+
+The module follows a clean, service-oriented architecture:
+
+notifications/
+│
+├── models.py
+├── serializers.py
+├── views.py
+├── urls.py
+├── services.py
+├── email_service.py
+├── sms_service.py
+Design Principles Used
+
+Separation of concerns
+
+Service layer pattern
+
+Enum-based validation
+
+JWT-based authentication
+
+Secure user-level filtering
+
+Extensible notification delivery system
+
+🔐 Authentication & Security
+
+This module uses:
+
+djangorestframework-simplejwt
+
+Access Token & Refresh Token mechanism
+
+IsAuthenticated permission enforcement
+
+Security Features
+
+All endpoints require JWT authentication
+
+Notifications are scoped to the logged-in user
+
+No hardcoded user references
+
+Enum validation prevents invalid notification types
+
+Unauthorized access returns HTTP 401
+
+🔔 Supported Notification Types
+
+The module uses Django TextChoices enum to enforce strict validation.
+
+Allowed Types:
+
+SHIPMENT_ASSIGNED
+
+DELIVERY_UPDATE
+
+PAYMENT_RECEIVED
+
+PAYOUT_PROCESSED
+
+Invalid types are rejected with validation errors.
+
+⚙️ Core Functionality
+1️⃣ Create Notification (Service Layer)
+
+Reusable business logic function:
+
+create_notification(user, notification_type, reference_id=None)
+
+This function:
+
+Generates title & message automatically
+
+Saves notification to database
+
+Sends email notification
+
+Sends SMS (mock implementation)
+
+2️⃣ Mark Notification as Read
+
+Users can mark notifications as read via API endpoint.
+
+3️⃣ Email Support
+
+Uses Django console email backend (development mode)
+
+Automatically sends email when notification is created
+
+Easily configurable for SMTP in production
+
+Example Output in Console:
+
+Subject: Payment Received
+Message: Payment has been successfully received.
+4️⃣ SMS Support (Mock Implementation)
+
+SMS service prints message in console
+
+Designed to integrate with real SMS gateway (Twilio/MSG91/etc.)
+
+Easily extendable to production
+
+Example Console Output:
+
+📱 SMS SENT
+To User: Arun
+Message: Your payout has been processed.
+🌐 API Endpoints
+🔑 Authentication
+Method	Endpoint	Description
+POST	/api/token/	Generate JWT token
+POST	/api/token/refresh/	Refresh access token
+🔔 Notifications
+Method	Endpoint	Description
+GET	/api/notifications/	List logged-in user notifications
+POST	/api/notifications/create/	Create new notification
+PATCH	/api/notifications/{id}/read/	Mark notification as read
+🧪 Testing Instructions
+Step 1: Generate Token
+POST /api/token/
+
+Provide username & password.
+
+Step 2: Use Bearer Token
+
+Add in Authorization header:
+
+Authorization: Bearer <access_token>
+Step 3: Create Notification
+{
+    "title": "Payment Received",
+    "message": "Payment for shipment #500 received",
+    "type": "PAYMENT_RECEIVED",
+    "reference_id": null
+}
+Step 4: Validate Security
+
+Without token:
+
+401 Unauthorized
+
+With token:
+
+201 Created
+📊 Database Model Structure
+class Notification(models.Model):
+
+    class NotificationType(models.TextChoices):
+        SHIPMENT_ASSIGNED = "SHIPMENT_ASSIGNED"
+        DELIVERY_UPDATE = "DELIVERY_UPDATE"
+        PAYMENT_RECEIVED = "PAYMENT_RECEIVED"
+        PAYOUT_PROCESSED = "PAYOUT_PROCESSED"
+
+Fields:
+
+id (UUID)
+
+user (ForeignKey)
+
+title
+
+message
+
+type (Enum)
+
+reference_id
+
+is_read
+
+created_at
+
+🔄 Business Flow
+
+When an event occurs:
+
+System calls create_notification()
+
+Notification is saved in DB
+
+Email is triggered
+
+SMS is triggered
+
+User can view via secure API
+
+🚀 Future Enhancements
+
+Real SMTP integration
+
+SMS gateway integration
+
+Push notification support
+
+Unread notification count API
+
+WebSocket real-time notifications
+
+Event-driven architecture (signals / Celery)
+
+Multi-tenant support integration
+
+Notification preferences per user
+
+✅ Compliance With Project Requirements
+
+✔ Generate notifications for required events
+✔ Mark notifications as read
+✔ JWT-based authentication
+✔ Email support
+✔ SMS support (mock)
+✔ Clean architecture
+✔ Production-ready structure
+
+🏁 Status
+
+Notifications module is fully implemented and ready for integration with:
+
+Shipment Management
+
+Payment Module
+
+Earnings & Payout Module
