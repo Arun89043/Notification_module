@@ -1,11 +1,10 @@
 from .models import Notification
-from .email_service import send_notification_email
 from .sms_service import send_notification_sms
 
 
 def create_notification(user, notification_type, reference_id=None):
     """
-    Reusable function to create notifications + send email + send SMS
+    Create notification + send SMS
     """
 
     # Auto title + message based on type
@@ -26,9 +25,10 @@ def create_notification(user, notification_type, reference_id=None):
         message = "Your payout has been processed."
 
     else:
-        return None
+        title = "Notification"
+        message = "You have a new notification."
 
-    # Create notification in DB
+    # ✅ Create notification in DB
     notification = Notification.objects.create(
         user=user,
         title=title,
@@ -37,10 +37,34 @@ def create_notification(user, notification_type, reference_id=None):
         reference_id=reference_id
     )
 
-    # Send Email
-    send_notification_email(user, title, message)
+    print("Notification auto triggered:", title)
 
-    # Send SMS (mock)
-    send_notification_sms(user, message)
+    # ✅ Send SMS
+    try:
+        send_notification_sms(user, message)
+    except Exception as e:
+        print("SMS Error:", e)
 
     return notification
+
+
+# 🔥 Trigger functions
+def trigger_delivery_update(user):
+    return create_notification(
+        user=user,
+        notification_type=Notification.NotificationType.DELIVERY_UPDATE
+    )
+
+
+def trigger_payment_received(user):
+    return create_notification(
+        user=user,
+        notification_type=Notification.NotificationType.PAYMENT_RECEIVED
+    )
+
+
+def trigger_payout_processed(user):
+    return create_notification(
+        user=user,
+        notification_type=Notification.NotificationType.PAYOUT_PROCESSED
+    )

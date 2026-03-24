@@ -1,15 +1,16 @@
 def send_notification_sms(user, message):
-    """
-    Mock SMS sending service.
-    In production, integrate with SMS gateway (Twilio, MSG91, etc.)
-    """
+    
+    print("📱 SMS SERVICE STARTED")
 
-    # Assuming user has phone number field in future
-    # For now we simulate SMS sending
+    phone = getattr(user, "phone_number", None)
 
-    print("📱 SMS SENT")
-    print(f"To User: {user.username}")
+    if phone:
+        print(f"To: {phone}")
+    else:
+        print("⚠️ No phone number found, sending to user only")
+
+    print(f"User: {user.username}")
     print(f"Message: {message}")
-    print("--------------------------------------------------")
+    print("---------------------------")
 
     return True

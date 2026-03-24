@@ -1,12 +1,13 @@
 from django.urls import path
-from .views import (
-    NotificationListView,
-    NotificationCreateView,
-    MarkNotificationReadView
-)
+from . import views
 
 urlpatterns = [
-    path("", NotificationListView.as_view(), name="notification-list"),
-    path("create/", NotificationCreateView.as_view(), name="notification-create"),
-    path("<uuid:pk>/read/", MarkNotificationReadView.as_view(), name="notification-read"),
+    path("", views.NotificationListView.as_view()),
+    path("create/", views.create_notification_view),
+    path("<uuid:pk>/read/", views.MarkNotificationReadView.as_view()),
+
+    # test APIs
+    path("test-payment/", views.test_payment),
+    path("test-delivery/", views.test_delivery),
+    path("test-payout/", views.test_payout),
 ]
